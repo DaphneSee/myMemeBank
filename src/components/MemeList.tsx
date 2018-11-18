@@ -24,6 +24,7 @@ export default class MemeList extends React.Component<IProps, {}> {
                             
                             <div className="btn btn-outline-secondary search-button" onClick = {this.searchByTag}>Search</div>
                             <div className="btn" onClick={this.searchTagByVoice}><i className="fa fa-microphone" /></div>
+                            
                         </div>
                     </div>  
                 </div>
@@ -68,6 +69,7 @@ export default class MemeList extends React.Component<IProps, {}> {
     // Search meme by tag
     private searchByTag() {
         const textBox = document.getElementById("search-tag-textbox") as HTMLInputElement
+        
         if (textBox === null) {
             return;
         }
@@ -77,6 +79,8 @@ export default class MemeList extends React.Component<IProps, {}> {
 
     //search tag by voice
     private searchTagByVoice(){
+        const textBox = document.getElementById("search-tag-textbox") as HTMLInputElement
+        textBox.value = (res.DisplayText as string).slice(0, -1)
         const mediaConstraints = {
             audio: true
     };
@@ -99,7 +103,7 @@ export default class MemeList extends React.Component<IProps, {}> {
     private postAudio(blob:any){
 
     let accessToken: any;
-    fetch('https://westus.api.cognitive.microsoft.com/sts/v1.0', {
+    fetch('https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken', {
         headers: {
             'Content-Length': '0',
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -116,23 +120,24 @@ export default class MemeList extends React.Component<IProps, {}> {
         console.log("Error", error)
     });
 
-    fetch('[YOUR API END POINT]', {
+    fetch('https://westus.api.cognitive.microsoft.com/sts/v1.0', {
         body: blob, // this is a .wav audio file    
         headers: {
             'Accept': 'application/json',
             'Authorization': 'Bearer' + accessToken,
             'Content-Type': 'audio/wav;codec=audio/pcm; samplerate=16000',
-            'Ocp-Apim-Subscription-Key': '[YOUR SUBSCRIPTION KEY]'
+            'Ocp-Apim-Subscription-Key': 'f599dba25a3d443c82ff196f6587984e'
         },    
         method: 'POST'
     }).then((res) => {
         return res.json()
     }).then((res: any) => {
         console.log(res)
+        const textBox = document.getElementById("search-tag-textbox") as HTMLInputElement
+        textBox.value = (res.DisplayText as string).slice(0, -1)
     }).catch((error) => {
         console.log("Error", error)
     });
-
 
 }
 
